@@ -1,0 +1,417 @@
+<div class="card">
+  <p-menubar [model]="items" />
+</div>
+<div class="card">
+  <div class="card">
+    <div class="flex justify-content-between align-item-center">
+      <h2 style="color: #495057">Party Mangement Detail</h2>
+      <span class="flex align-items-center"
+        ><p-button
+          (onClick)="showAddEditDialog()"
+          label="Add Party"
+          icon="pi pi-plus"
+        ></p-button>
+      </span>
+    </div>
+  </div>
+
+  <div class="card">
+    <p-table
+      [value]="parties"
+      scrollable="true"
+      responsiveLayout="scrollable"
+      styleClass="p-datatable-gridlines"
+      [lazy]="true"
+      (onLazyLoad)="getAllParties()"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 10px">Action</th>
+          <th>Customer Name</th>
+          <th>Company Name</th>
+          <th>Email</th>
+          <th>GSTIN</th>
+          <th>Credit Limit</th>
+          <th>Apply TDS</th>
+          <th>PAN</th>
+          <th style="width: 200px">Address</th>
+          <th>Anniversary Date</th>
+          <th>Date of Birth</th>
+          <th>Mobile No</th>
+          <th>Whatspp No</th>
+          <th>Remark</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-customer>
+        <tr>
+          <td>
+            <a
+              class="ripplelink tabmenuitem-link"
+              (click)="menu.toggle($event); toggleMenu(customer)"
+            >
+              <p-button class="ellipsis">
+                <i class="pi pi-ellipsis-h"></i>
+              </p-button>
+            </a>
+            <p-menu
+              [appendTo]="'body'"
+              #menu
+              [popup]="true"
+              [model]="menuItems"
+            ></p-menu>
+          </td>
+          <td>{{ customer.name | titlecase }}</td>
+          <td>{{ customer.company_name }}</td>
+          <td>{{ customer.email }}</td>
+          <td>{{ customer.gstin }}</td>
+          <td>{{ customer.credit_limit }}</td>
+          <td>{{ customer.apply_tds ? "YES" : "NO" }}</td>
+          <td>{{ customer.pan_no }}</td>
+          <td>
+            <ng-container *ngFor="let address of customer.address">
+              <div style="width: 200px">
+                {{ address.address_line_1 }}, {{ address.address_line_2 }},
+                {{ address.country }}
+              </div>
+            </ng-container>
+          </td>
+          <td>{{ customer.anniversary_date }}</td>
+          <td>{{ customer.date_of_birth }}</td>
+          <td>{{ customer.mobile_no }}</td>
+          <td>{{ customer.whatsapp_no }}</td>
+          <td>{{ customer.remark }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<p-dialog
+  header="{{ partyDetails ? 'Edit Party' : 'Add Party' }} "
+  [(visible)]="visible"
+  (onHide)="onClose()"
+>
+  <div class="card flex justify-content-center">
+    <form [formGroup]="profileForm">
+      <div class="flex align-items-center gap-3 mb-3">
+        <label for="username" class="font-semibold w-6rem">Name</label>
+        <input
+          pInputText
+          id="username"
+          class="flex-auto"
+          formControlName="name"
+          autocomplete="off"
+        />
+      </div>
+      <div class="flex align-items-center gap-3 mb-5">
+        <label for="company_name" class="font-semibold w-6rem"
+          >Company Name<small style="color: red">*</small></label
+        >
+        <div>
+          <input
+            pInputText
+            id="company_name"
+            class="flex-auto"
+            autocomplete="off"
+            formControlName="company_name"
+          />
+
+          <ng-container
+            *ngIf="
+              profileForm.get('company_name')?.dirty ||
+              profileForm.get('company_name')?.touched
+            "
+          >
+            <div
+              style="color: red"
+              *ngIf="profileForm.get('company_name')?.hasError('required')"
+            >
+              Field is required
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <div class="flex align-items-center gap-3 mb-5">
+        <label for="mobile_no" class="font-semibold w-6rem"
+          >Mobile No<small style="color: red">*</small></label
+        >
+        <div>
+          <input
+            pInputText
+            id="mobile_no"
+            class="flex-auto"
+            autocomplete="off"
+            formControlName="mobile_no"
+          />
+          <ng-container
+            *ngIf="
+              profileForm.get('mobile_no')?.dirty ||
+              profileForm.get('mobile_no')?.touched
+            "
+          >
+            <div
+              style="color: red"
+              *ngIf="profileForm.get('mobile_no')?.hasError('required')"
+            >
+              Field is required
+            </div>
+            <div
+              style="color: red"
+              *ngIf="profileForm.get('mobile_no')?.hasError('pattern')"
+            >
+              Invalid format
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <div class="flex align-items-center gap-3 mb-5">
+        <label for="email" class="font-semibold w-6rem"
+          >Email<small style="color: red">*</small></label
+        >
+        <div>
+          <input
+            pInputText
+            id="email"
+            class="flex-auto"
+            autocomplete="off"
+            formControlName="email"
+          />
+          <ng-container
+            *ngIf="
+              profileForm.get('email')?.dirty ||
+              profileForm.get('email')?.touched
+            "
+          >
+            <div
+              style="color: red"
+              *ngIf="profileForm.get('email')?.hasError('required')"
+            >
+              Field is required
+            </div>
+            <div
+              style="color: red"
+              *ngIf="profileForm.get('email')?.hasError('email')"
+            >
+              Invalid format
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <div class="flex align-items-center gap-3 mb-5">
+        <label for="telephone_no" class="font-semibold w-6rem"
+          >Telephone No</label
+        >
+        <input
+          pInputText
+          id="telephone_no"
+          class="flex-auto"
+          autocomplete="off"
+          formControlName="telephone_no"
+        />
+      </div>
+      <div class="flex align-items-center gap-3 mb-5">
+        <label for="whatsapp_no" class="font-semibold w-6rem"
+          >Whatsapp No</label
+        >
+        <input
+          pInputText
+          id="whatsapp_no"
+          class="flex-auto"
+          autocomplete="off"
+          formControlName="whatsapp_no"
+        />
+      </div>
+
+      <div class="flex align-items-center gap-3 mb-5">
+        <label for="login_access" class="font-semibold w-6rem"
+          >Login Access<small style="color: red">*</small></label
+        >
+        <p-checkbox formControlName="login_access" binary="true" />
+      </div>
+      <div class="flex align-items-center gap-3 mb-5">
+        <label for="date_of_birth" class="font-semibold w-6rem"
+          >Date of Birth<small style="color: red">*</small></label
+        >
+        <div>
+          <p-calendar
+            formControlName="date_of_birth"
+            inputId="date_of_birth"
+            appendTo="body"
+            dateFormat="yy.mm.dd"
+          />
+          <ng-container
+            *ngIf="
+              profileForm.get('date_of_birth')?.dirty ||
+              profileForm.get('date_of_birth')?.touched
+            "
+          >
+            <div
+              style="color: red"
+              *ngIf="profileForm.get('date_of_birth')?.hasError('required')"
+            >
+              Field is required
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <div class="flex align-items-center gap-3 mb-5">
+        <label for="anniversary_date" class="font-semibold w-6rem"
+          >Anniversary Date<small style="color: red">*</small></label
+        >
+        <div>
+          <p-calendar
+            formControlName="anniversary_date"
+            inputId="anniversary_date"
+            appendTo="body"
+            dateFormat="yy.mm.dd"
+          />
+          <ng-container
+            *ngIf="
+              profileForm.get('anniversary_date')?.dirty ||
+              profileForm.get('anniversary_date')?.touched
+            "
+          >
+            <div
+              style="color: red"
+              *ngIf="profileForm.get('anniversary_date')?.hasError('required')"
+            >
+              Field is required
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <div class="flex align-items-center gap-3 mb-5">
+        <label for="gstin" class="font-semibold w-6rem"
+          >GSTIN<small style="color: red">*</small></label
+        >
+        <input
+          pInputText
+          id="gstin"
+          class="flex-auto"
+          autocomplete="off"
+          formControlName="gstin"
+        />
+        <ng-container
+          *ngIf="
+            profileForm.get('gstin')?.dirty || profileForm.get('gstin')?.touched
+          "
+        >
+          <div
+            style="color: red"
+            *ngIf="profileForm.get('gstin')?.hasError('required')"
+          >
+            Field is required
+          </div>
+        </ng-container>
+      </div>
+      <div class="flex align-items-center gap-3 mb-5">
+        <label for="pan_no" class="font-semibold w-6rem">PAN No</label>
+        <div>
+          <input
+            pInputText
+            id="pan_no"
+            class="flex-auto"
+            autocomplete="off"
+            formControlName="pan_no"
+          />
+          <ng-container
+            *ngIf="
+              profileForm.get('pan_no')?.dirty ||
+              profileForm.get('pan_no')?.touched
+            "
+          >
+            <div
+              style="color: red"
+              *ngIf="profileForm.get('pan_no')?.hasError('pattern')"
+            >
+              Invalid format
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <div class="flex align-items-center gap-3 mb-5">
+        <label for="bank" class="font-semibold w-6rem">Bank</label>
+        <input
+          pInputText
+          id="bank"
+          class="flex-auto"
+          autocomplete="off"
+          formControlName="bank"
+        />
+      </div>
+      <div class="flex align-items-center gap-3 mb-5">
+        <label for="apply_tds" class="font-semibold w-6rem">TDS</label>
+        <p-checkbox formControlName="apply_tds" binary="true" />
+      </div>
+      <div class="flex align-items-center gap-3 mb-5">
+        <label for="credit_limit" class="font-semibold w-6rem"
+          >Credit Limit<small style="color: red">*</small></label
+        >
+        <div>
+          <p-inputNumber formControlName="credit_limit" />
+          <ng-container
+            *ngIf="
+              profileForm.get('credit_limit')?.dirty ||
+              profileForm.get('credit_limit')?.touched
+            "
+          >
+            <div
+              style="color: red"
+              *ngIf="profileForm.get('credit_limit')?.hasError('required')"
+            >
+              Field is required
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <div class="flex align-items-center gap-3 mb-5">
+        <label for="remark" class="font-semibold w-6rem">Remark</label>
+        <textarea
+          cols="5"
+          rows="5"
+          id="remark"
+          class="flex-auto"
+          autocomplete="off"
+          formControlName="remark"
+        ></textarea>
+      </div>
+
+      <div class="flex justify-content-end gap-2">
+        <button
+          label="Cancel"
+          class="p-button-primary"
+          pButton
+          (click)="visible = false; onClose()"
+        ></button>
+        <button
+          label="Save"
+          class="p-button-success"
+          pButton
+          [disabled]="this.profileForm.invalid"
+          (click)="visible = false; saveParty()"
+        ></button>
+      </div>
+    </form>
+  </div>
+</p-dialog>
+<p-dialog header="Delete" [visible]="deleteDialog" closable="false">
+  <div class="card flex flex-column justify-content-center">
+    <span class="p-text-secondary block mb-5"
+      >Do you really want to delete this party?</span
+    >
+    <div class="flex justify-content-end gap-2">
+      <button
+        label="Cancel"
+        class="p-button-primary"
+        pButton
+        (click)="closeDeleteDialog()"
+      ></button>
+      <button
+        label="Delete"
+        class="p-button-danger"
+        pButton
+        (click)="deletePartyDetails()"
+      ></button>
+    </div>
+  </div>
+</p-dialog>

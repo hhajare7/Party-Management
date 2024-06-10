@@ -1,0 +1,78 @@
+<div class="card">
+  <div class="loginPage">
+    <div>
+      <h1 class="flex justify-content-center">Login Details</h1>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="formDetails col-12 m-2">
+          <label class="m-3 text-lg label" for="username"
+            >Username
+            <small style="color: red">*</small>
+          </label>
+          <div>
+            <input
+              pInputText
+              id="username"
+              type="text"
+              formControlName="username"
+              class="input"
+            />
+            <ng-container
+              *ngIf="
+                loginForm.get('username')?.dirty ||
+                loginForm.get('username')?.touched
+              "
+            >
+              <div
+                style="color: red"
+                *ngIf="loginForm.get('username')?.hasError('required')"
+              >
+                Field is required
+              </div>
+            </ng-container>
+          </div>
+        </div>
+        <div class="formDetails col-12 m-2">
+          <label class="m-3 text-lg label" for="password"
+            >Password <small style="color: red">*</small>
+          </label>
+          <div>
+            <input
+              pInputText
+              id="password"
+              type="password"
+              formControlName="password"
+              class="input"
+            />
+            <ng-container
+              *ngIf="
+                loginForm.get('password')?.dirty ||
+                loginForm.get('password')?.touched
+              "
+            >
+              <div
+                style="color: red"
+                *ngIf="loginForm.get('password')?.hasError('required')"
+              >
+                Field is required
+              </div>
+            </ng-container>
+          </div>
+        </div>
+        <p-button
+          label="Login"
+          icon="pi pi-user"
+          class="button"
+          [disabled]="loginForm.invalid"
+          type="submit"
+        ></p-button>
+      </form>
+      <div
+        style="color: red"
+        *ngIf="errorMessage"
+        class="error-message font-medium m-2 text-lg flex justify-content-center"
+      >
+        {{ errorMessage }}
+      </div>
+    </div>
+  </div>
+</div>
